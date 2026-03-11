@@ -1,0 +1,5 @@
+{
+  "name": "Smart Weather App",
+  "description": "Aplikasi cuaca cerdas dengan saran personal dari Gemini AI",
+  "requestFramePermissions": ["geolocation"]
+}

@@ -1,0 +1,4 @@
+@import "tailwindcss";
+
+/* Leaflet CSS is imported directly in WeatherMap.tsx (dynamic import).
+   Importing it here too causes style conflicts — removed. */
