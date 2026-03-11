@@ -12,7 +12,6 @@ interface SearchHeaderProps {
   onSearch: (city: string) => void;
   searchHistory: string[];
   clearHistory: () => void;
-  // FIX: added city prop — was hardcoded as "Jakarta, ID"
   city?: string;
   country?: string;
 }
@@ -31,7 +30,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
   const [inputValue, setInputValue] = React.useState('');
   const [showHistory, setShowHistory] = React.useState(false);
 
-  const formattedDate = new Date().toLocaleDateString('en-US', {
+  const formattedDate = new Date().toLocaleDateString('id-ID', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -52,13 +51,9 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
         <motion.button
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="lg:hidden p-3 bg-white rounded-2xl shadow-sm border border-slate-100"
+          className="lg:hidden p-3 bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-white/50 text-slate-700"
         >
-          {isMenuOpen ? (
-            <X className="w-6 h-6" />
-          ) : (
-            <Menu className="w-6 h-6" />
-          )}
+          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </motion.button>
 
         <div className="relative w-full max-w-md">
@@ -69,13 +64,13 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
               onChange={(e) => setInputValue(e.target.value)}
               onFocus={() => setShowHistory(true)}
               onBlur={() => setTimeout(() => setShowHistory(false), 200)}
-              placeholder="Search city..."
-              className="w-full bg-white border-none rounded-2xl py-3 md:py-4 pl-12 md:pl-14 pr-6 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400 font-medium text-sm md:text-base"
+              placeholder="Cari kota..."
+              className="w-full bg-white/90 backdrop-blur-xl border-none rounded-2xl py-3 md:py-4 pl-12 md:pl-14 pr-6 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400 font-medium text-sm md:text-base"
             />
             <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 md:w-5 md:h-5" />
           </form>
 
-          {/* Search History Dropdown */}
+          {/* Dropdown Riwayat Pencarian */}
           <AnimatePresence>
             {showHistory && searchHistory.length > 0 && (
               <motion.div
@@ -86,13 +81,10 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
               >
                 <div className="p-4 border-b border-slate-50 flex justify-between items-center">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Recent Searches
+                    Pencarian Terakhir
                   </span>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      clearHistory();
-                    }}
+                    onClick={(e) => { e.stopPropagation(); clearHistory(); }}
                     className="text-slate-300 hover:text-rose-500 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -103,10 +95,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                     <button
                       key={idx}
                       type="button"
-                      onClick={() => {
-                        onSearch(c);
-                        setShowHistory(false);
-                      }}
+                      onClick={() => { onSearch(c); setShowHistory(false); }}
                       className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors text-left"
                     >
                       <Clock className="w-4 h-4 text-slate-300" />
@@ -125,7 +114,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
           whileTap={{ scale: 0.95 }}
           whileHover={{ scale: 1.05 }}
           onClick={() => setIsCelsius(!isCelsius)}
-          className="bg-white px-3 md:px-4 py-2 md:py-3 rounded-2xl shadow-sm border border-slate-100 text-xs md:text-sm font-bold text-blue-600 flex items-center gap-2"
+          className="bg-white/90 backdrop-blur-xl px-3 md:px-4 py-2 md:py-3 rounded-2xl shadow-sm border border-white/50 text-xs md:text-sm font-bold text-blue-600 flex items-center gap-2"
         >
           <span className={isCelsius ? 'opacity-100' : 'opacity-30'}>°C</span>
           <div className="w-[1px] h-3 bg-slate-200" />
@@ -134,13 +123,12 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
 
         <div className="hidden sm:flex items-center space-x-4">
           <div className="hidden md:block text-right">
-            {/* FIX: dynamic city from prop, not hardcoded "Jakarta, ID" */}
-            <p className="text-sm font-bold text-slate-900">{city}, {country}</p>
-            <p className="text-xs text-slate-400 font-medium">{formattedDate}</p>
+            <p className="text-sm font-bold text-white">{city}, {country}</p>
+            <p className="text-xs text-white/70 font-medium">{formattedDate}</p>
           </div>
           <motion.div
             whileHover={{ rotate: 15 }}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center"
+            className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/90 backdrop-blur-xl shadow-sm flex items-center justify-center"
           >
             <Clock className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
           </motion.div>

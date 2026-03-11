@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Share2, Copy, Check, X, Download } from 'lucide-react';
+import { Share2, Copy, Check, X } from 'lucide-react';
 import { WeatherData } from '../lib/mockData';
 import { getUVLevel } from '../hooks/useWeather';
 
@@ -26,10 +26,10 @@ const ShareWidget: React.FC<ShareWidgetProps> = ({ weatherData, isCelsius, conve
     `🌤️ Cuaca di ${weatherData.city}\n` +
     `🌡️ ${temp}${unit} — ${weatherData.description}\n` +
     `💧 Kelembaban: ${weatherData.humidity}%\n` +
-    `💨 Angin: ${weatherData.wind_speed} km/h\n` +
+    `💨 Angin: ${weatherData.wind_speed} km/jam\n` +
     (uvLevel ? `☀️ UV: ${weatherData.uv_index} (${uvLevel.label})\n` : '') +
-    (weatherData.sunrise ? `🌅 Sunrise: ${weatherData.sunrise}\n` : '') +
-    (weatherData.sunset  ? `🌇 Sunset: ${weatherData.sunset}\n`  : '') +
+    (weatherData.sunrise ? `🌅 Matahari Terbit: ${weatherData.sunrise}\n` : '') +
+    (weatherData.sunset  ? `🌇 Matahari Terbenam: ${weatherData.sunset}\n` : '') +
     `\nvia SkyCast Dashboard`;
 
   const handleCopy = async () => {
@@ -48,7 +48,6 @@ const ShareWidget: React.FC<ShareWidgetProps> = ({ weatherData, isCelsius, conve
 
   return (
     <>
-      {/* Share Button */}
       <motion.button
         whileTap={{ scale: 0.95 }}
         whileHover={{ scale: 1.05 }}
@@ -56,10 +55,9 @@ const ShareWidget: React.FC<ShareWidgetProps> = ({ weatherData, isCelsius, conve
         className="flex items-center gap-2 bg-white px-4 py-2.5 rounded-2xl shadow-sm border border-slate-100 text-xs font-bold text-slate-600 hover:text-blue-600 hover:border-blue-100 transition-colors"
       >
         <Share2 className="w-4 h-4" />
-        <span className="hidden sm:inline">Share</span>
+        <span className="hidden sm:inline">Bagikan</span>
       </motion.button>
 
-      {/* Modal */}
       <AnimatePresence>
         {isOpen && (
           <>
@@ -85,10 +83,10 @@ const ShareWidget: React.FC<ShareWidgetProps> = ({ weatherData, isCelsius, conve
                   <X className="w-4 h-4" />
                 </button>
 
-                <h3 className="text-base font-black text-slate-900 mb-1">Share Cuaca</h3>
-                <p className="text-xs text-slate-400 mb-4">Bagikan kondisi cuaca sekarang</p>
+                <h3 className="text-base font-black text-slate-900 mb-1">Bagikan Cuaca</h3>
+                <p className="text-xs text-slate-400 mb-4">Bagikan kondisi cuaca saat ini</p>
 
-                {/* Preview Card */}
+                {/* Kartu Pratinjau */}
                 <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl p-5 mb-4 text-white">
                   <div className="flex items-start justify-between mb-3">
                     <div>
@@ -104,13 +102,13 @@ const ShareWidget: React.FC<ShareWidgetProps> = ({ weatherData, isCelsius, conve
                     <span className="text-4xl font-black">{temp}{unit}</span>
                     <div className="text-right text-xs opacity-70 space-y-0.5">
                       <p>💧 {weatherData.humidity}%</p>
-                      <p>💨 {weatherData.wind_speed} km/h</p>
+                      <p>💨 {weatherData.wind_speed} km/jam</p>
                       {weatherData.uv_index != null && <p>☀️ UV {weatherData.uv_index}</p>}
                     </div>
                   </div>
                 </div>
 
-                {/* Actions */}
+                {/* Tombol Aksi */}
                 <div className="grid grid-cols-2 gap-3">
                   <motion.button
                     whileTap={{ scale: 0.97 }}
@@ -118,9 +116,9 @@ const ShareWidget: React.FC<ShareWidgetProps> = ({ weatherData, isCelsius, conve
                     className="flex items-center justify-center gap-2 py-3 bg-slate-50 hover:bg-slate-100 rounded-2xl text-sm font-bold text-slate-700 transition-colors border border-slate-100"
                   >
                     {copied ? (
-                      <><Check className="w-4 h-4 text-emerald-500" /><span className="text-emerald-500">Copied!</span></>
+                      <><Check className="w-4 h-4 text-emerald-500" /><span className="text-emerald-500">Tersalin!</span></>
                     ) : (
-                      <><Copy className="w-4 h-4" /><span>Copy Text</span></>
+                      <><Copy className="w-4 h-4" /><span>Salin Teks</span></>
                     )}
                   </motion.button>
                   <motion.button
@@ -129,7 +127,7 @@ const ShareWidget: React.FC<ShareWidgetProps> = ({ weatherData, isCelsius, conve
                     className="flex items-center justify-center gap-2 py-3 bg-blue-600 hover:bg-blue-700 rounded-2xl text-sm font-bold text-white transition-colors"
                   >
                     <Share2 className="w-4 h-4" />
-                    <span>Share</span>
+                    <span>Bagikan</span>
                   </motion.button>
                 </div>
               </div>

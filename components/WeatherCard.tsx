@@ -3,8 +3,9 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Wind, Droplets, Eye } from 'lucide-react';
-// FIX: import from unified types file using correct path
-import { WeatherData } from '../src/types/weather';
+// FIX: was importing from '../src/types/weather' which doesn't exist.
+// WeatherData is defined in mockData — use that single source of truth.
+import { WeatherData } from '../lib/mockData';
 
 interface WeatherCardProps {
   data: WeatherData;
@@ -38,7 +39,7 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
           </div>
         </div>
 
-        {/* FIX: icon is now optional — only render if present */}
+        {/* icon is optional — only render if present */}
         {data.icon && (
           <div className="flex flex-col items-end">
             <motion.img
@@ -52,7 +53,7 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
                 repeatType: 'reverse',
                 duration: 4,
               }}
-              src={`https://openweathermap.org/img/wn/${data.icon}@4x.png`}
+              src={data.icon}
               alt={data.description}
               className="w-32 h-32 -mt-4 -mr-4 drop-shadow-[0_10px_30px_rgba(255,255,255,0.2)]"
             />
@@ -64,7 +65,6 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
         <h3 className="text-2xl font-bold text-white/90 capitalize tracking-tight">
           {data.description}
         </h3>
-        {/* FIX: was using camelCase feelsLike — now uses snake_case feels_like */}
         <p className="text-blue-200/50 text-sm font-medium">
           Terasa seperti {data.feels_like}°C
         </p>
@@ -89,7 +89,6 @@ export const WeatherCard = ({ data }: WeatherCardProps) => {
           <span className="text-[10px] text-white/30 uppercase tracking-[0.2em] font-bold mb-1">
             Wind
           </span>
-          {/* FIX: was using camelCase windSpeed — now uses snake_case wind_speed */}
           <span className="text-lg font-bold text-white">
             {data.wind_speed}{' '}
             <span className="text-xs font-medium text-white/40">km/h</span>

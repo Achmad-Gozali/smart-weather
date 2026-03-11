@@ -5,8 +5,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Smart Weather App',
-  description: 'Aplikasi cuaca cerdas dengan saran personal dari Gemini AI',
+  title: 'SkyCast — Aplikasi Cuaca Cerdas',
+  description: 'Aplikasi cuaca cerdas dengan saran personal dari AI',
 };
 
 export default function RootLayout({

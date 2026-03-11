@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { AlertTriangle, X, ChevronDown, ChevronUp, Zap } from 'lucide-react';
+import { AlertTriangle, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { WeatherAlert } from '../lib/mockData';
 
 interface WeatherAlertBannerProps {
@@ -14,6 +14,13 @@ const SEVERITY_STYLES = {
   moderate: { bg: 'bg-orange-50',  border: 'border-orange-200', icon: 'text-orange-500', badge: 'bg-orange-100 text-orange-700' },
   severe:   { bg: 'bg-rose-50',    border: 'border-rose-200',   icon: 'text-rose-500',   badge: 'bg-rose-100 text-rose-700'     },
   extreme:  { bg: 'bg-purple-50',  border: 'border-purple-200', icon: 'text-purple-600', badge: 'bg-purple-100 text-purple-700' },
+};
+
+const SEVERITY_LABELS: Record<string, string> = {
+  minor:    'Ringan',
+  moderate: 'Sedang',
+  severe:   'Parah',
+  extreme:  'Ekstrem',
 };
 
 const WeatherAlertBanner: React.FC<WeatherAlertBannerProps> = ({ alerts }) => {
@@ -49,7 +56,7 @@ const WeatherAlertBanner: React.FC<WeatherAlertBannerProps> = ({ alerts }) => {
                     <div className="flex items-center gap-2 flex-wrap mb-1">
                       <span className="text-sm font-black text-slate-900">{alert.headline}</span>
                       <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${style.badge}`}>
-                        {alert.severity}
+                        {SEVERITY_LABELS[alert.severity] ?? alert.severity}
                       </span>
                     </div>
                     {alert.event && (
