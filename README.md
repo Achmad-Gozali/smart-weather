@@ -1,20 +1,12 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🌤️ Smart Weather Goz
 
-# Run and deploy your AI Studio app
+Website ini adalah aplikasi pemantau cuaca pintar yang bisa menganalisis kondisi cuaca secara dinamis. Nggak cuma sekadar nampilin angka suhu, aplikasi ini dibekali fitur asisten cerdas untuk memberikan saran aktivitas atau pakaian yang paling cocok buat harimu!
 
-This contains everything you need to run your app locally.
+**🌍 Coba langsung aplikasinya di sini:** [smart-weather-goz.vercel.app](https://smart-weather-goz.vercel.app/)
 
-View your app in AI Studio: https://ai.studio/apps/ed07b07a-633a-4f3b-aefa-553183f0cc4c
+## ✨ Fitur Utama
+* **Prakiraan Cuaca Interaktif:** Tanya dan dapatkan informasi kondisi cuaca dengan gaya obrolan.
+* **Rekomendasi Pintar:** Dapatkan tips harian sesuai cuaca (misal: "Cocok buat jemur baju hari ini" atau "Siapin payung, nanti sore gerimis").
+* **Asisten Virtual Terintegrasi:** Respons yang natural, cepat, dan informatif.
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## ⚙️ Run Locally
