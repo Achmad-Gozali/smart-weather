@@ -2,56 +2,52 @@
 
 import React from 'react';
 import { motion } from 'motion/react';
-import { Home, Map, Settings, CloudRain, LucideIcon } from 'lucide-react';
+import { Home, Map, Settings } from 'lucide-react';
 
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
 }
 
-const SidebarItem = ({
-  icon: Icon,
-  active = false,
-  onClick,
-}: {
-  icon: LucideIcon;
-  active?: boolean;
-  onClick: () => void;
-}) => (
-  <motion.div
-    whileTap={{ scale: 0.9 }}
-    whileHover={{ scale: 1.1 }}
-    onClick={onClick}
-    className={`p-4 rounded-2xl cursor-pointer transition-all relative group ${
-      active
-        ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/30'
-        : 'text-white/60 hover:bg-white/20 hover:text-white'
-    }`}
-  >
-    <Icon className="w-6 h-6" />
-    {active && (
-      <motion.div
-        layoutId="sidebar-active"
-        className="absolute -left-2 top-1/2 -translate-y-1/2 w-1 h-6 bg-white rounded-full hidden lg:block"
-      />
-    )}
-  </motion.div>
-);
+const TABS = [
+  { id: 'home',     Icon: Home,     label: 'Beranda'    },
+  { id: 'map',      Icon: Map,      label: 'Peta'       },
+  { id: 'settings', Icon: Settings, label: 'Pengaturan' },
+];
 
-const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
-  return (
-    <aside className="hidden lg:flex flex-col items-center py-10 px-6 w-24 space-y-8 sticky top-0 h-screen z-40 bg-white/10 backdrop-blur-xl border-r border-white/20">
-      <motion.div
-        whileHover={{ rotate: 15 }}
-        className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/30 mb-8"
-      >
-        <CloudRain className="text-white w-7 h-7" />
-      </motion.div>
-      <SidebarItem icon={Home}     active={activeTab === 'home'}     onClick={() => setActiveTab('home')} />
-      <SidebarItem icon={Map}      active={activeTab === 'map'}      onClick={() => setActiveTab('map')} />
-      <SidebarItem icon={Settings} active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
-    </aside>
-  );
-};
+const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => (
+  <aside className="hidden lg:flex flex-col items-center gap-3 w-16 py-8 px-3 relative z-20">
+    {/* Logo */}
+    <div className="w-10 h-10 rounded-2xl bg-blue-500 flex items-center justify-center mb-4 shadow-lg shadow-blue-500/30">
+      <span className="text-white text-lg">🌤</span>
+    </div>
+
+    {/* Nav */}
+    <nav className="flex flex-col gap-2">
+      {TABS.map(({ id, Icon, label }) => {
+        const active = activeTab === id;
+        return (
+          <motion.button
+            key={id}
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setActiveTab(id)}
+            title={label}
+            className={`relative w-10 h-10 rounded-2xl flex items-center justify-center transition-all ${
+              active ? 'bg-white text-slate-900 shadow-lg' : 'text-white/30 hover:text-white/60 hover:bg-white/10'
+            }`}
+          >
+            <Icon className="w-[18px] h-[18px]" />
+            {active && (
+              <motion.div layoutId="activeTab"
+                className="absolute inset-0 rounded-2xl bg-white -z-10"
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              />
+            )}
+          </motion.button>
+        );
+      })}
+    </nav>
+  </aside>
+);
 
 export default Sidebar;

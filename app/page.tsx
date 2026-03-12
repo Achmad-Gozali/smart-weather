@@ -10,8 +10,8 @@ import WeatherBackground from '../components/WeatherBackground';
 import HomeTab from '../components/HomeTab';
 import MapTab from '../components/MapTab';
 import SettingsTab from '../components/SettingsTab';
-import ShareWidget from '../components/ShareWidget';
 import { useWeather } from '@/hooks/useWeather';
+import WeatherChatbot from '../components/WeatherChatbot';
 
 export default function WeatherDashboard() {
   const [activeTab, setActiveTab] = useState('home');
@@ -21,7 +21,9 @@ export default function WeatherDashboard() {
   const {
     currentTime, loading, weatherData, aqiData, alerts,
     coords, aiAdvice, lastUpdated, searchHistory,
-    handleSearch, clearHistory,
+    hourlyData, dailyData,
+    locationStatus, locationSource,
+    handleSearch, clearHistory, requestLocation,
   } = useWeather();
 
   const convert = (temp: number) =>
@@ -30,8 +32,8 @@ export default function WeatherDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
-        {/* Pakai WeatherBackground yang sama, bukan foto Unsplash */}
-        <WeatherBackground condition="clear" />
+        <WeatherBackground condition="" />
+        <div className="absolute inset-0 bg-slate-900/50 z-0" />
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
@@ -42,29 +44,24 @@ export default function WeatherDashboard() {
   }
 
   return (
-    <div className="min-h-screen flex font-sans text-slate-900 overflow-x-hidden relative">
-      <WeatherBackground condition={weatherData?.description || 'clear'} />
+    <div className="min-h-screen flex font-sans text-slate-900 overflow-hidden relative">
+      <WeatherBackground condition={weatherData?.description ?? ''} />
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-[1600px] mx-auto w-full relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="flex-1">
-            <SearchHeader
-              isMenuOpen={isMenuOpen}
-              setIsMenuOpen={setIsMenuOpen}
-              isCelsius={isCelsius}
-              setIsCelsius={setIsCelsius}
-              onSearch={handleSearch}
-              searchHistory={searchHistory}
-              clearHistory={clearHistory}
-              city={weatherData?.city}
-              country="ID"
-            />
-          </div>
-          <div className="mb-6 md:mb-10 shrink-0">
-            <ShareWidget weatherData={weatherData} isCelsius={isCelsius} convert={convert} />
-          </div>
-        </div>
+        <SearchHeader
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+          isCelsius={isCelsius}
+          setIsCelsius={setIsCelsius}
+          onSearch={handleSearch}
+          locationStatus={locationStatus}
+          locationSource={locationSource}
+          searchHistory={searchHistory}
+          clearHistory={clearHistory}
+          city={weatherData?.city}
+          country="ID"
+        />
 
         <AnimatePresence>
           {isMenuOpen && (
@@ -107,6 +104,11 @@ export default function WeatherDashboard() {
             coords={coords}
             aiAdvice={aiAdvice}
             lastUpdated={lastUpdated}
+            hourlyData={hourlyData}
+            dailyData={dailyData}
+            locationStatus={locationStatus}
+            locationSource={locationSource}
+            requestLocation={requestLocation}
           />
         )}
         {activeTab === 'map' && (
@@ -115,6 +117,8 @@ export default function WeatherDashboard() {
         {activeTab === 'settings' && (
           <SettingsTab isCelsius={isCelsius} setIsCelsius={setIsCelsius} searchHistory={searchHistory} clearHistory={clearHistory} />
         )}
+
+        <WeatherChatbot weatherData={weatherData} aqiData={aqiData} dailyData={dailyData ?? []} hourlyData={hourlyData ?? []} isCelsius={isCelsius} />
 
         <footer className="mt-16 md:mt-20 pb-8 md:pb-12 text-center">
           <div className="flex items-center justify-center space-x-4 mb-4">

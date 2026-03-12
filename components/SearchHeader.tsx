@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Menu, X, Clock, Trash2 } from 'lucide-react';
+import { Search, X, Clock, Trash2, MapPin, Loader2, MapPinOff, Wifi } from 'lucide-react';
+import { LocationSource } from '@/hooks/useWeather';
 
 interface SearchHeaderProps {
   isMenuOpen: boolean;
@@ -14,124 +15,126 @@ interface SearchHeaderProps {
   clearHistory: () => void;
   city?: string;
   country?: string;
+  locationStatus?: 'detecting' | 'granted' | 'denied' | 'idle';
+  locationSource?: LocationSource | null;
 }
 
+// Label + warna berdasarkan sumber lokasi
+const SOURCE_BADGE: Record<LocationSource, { label: string; color: string; icon: React.ElementType }> = {
+  'gps-high': { label: 'GPS Akurat',   color: 'text-emerald-400', icon: MapPin  },
+  'gps-low':  { label: 'GPS Cepat',    color: 'text-blue-400',    icon: MapPin  },
+  'ip':       { label: 'Via IP',       color: 'text-yellow-400',  icon: Wifi    },
+  'default':  { label: 'Lokasi default', color: 'text-white/35',  icon: MapPinOff },
+  'search':   { label: 'Hasil pencarian', color: 'text-blue-400', icon: Search  },
+};
+
 const SearchHeader: React.FC<SearchHeaderProps> = ({
-  isMenuOpen,
-  setIsMenuOpen,
-  isCelsius,
-  setIsCelsius,
-  onSearch,
-  searchHistory,
-  clearHistory,
-  city = 'Jakarta',
-  country = 'ID',
+  isMenuOpen, setIsMenuOpen, isCelsius, setIsCelsius,
+  onSearch, searchHistory, clearHistory,
+  city = 'Jakarta', country = 'ID',
+  locationStatus = 'idle', locationSource,
 }) => {
   const [inputValue, setInputValue] = React.useState('');
   const [showHistory, setShowHistory] = React.useState(false);
 
   const formattedDate = new Date().toLocaleDateString('id-ID', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
+    weekday: 'long', day: 'numeric', month: 'long',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (inputValue.trim()) {
-      onSearch(inputValue.trim());
-      setInputValue('');
-      setShowHistory(false);
-    }
+    if (inputValue.trim()) { onSearch(inputValue.trim()); setInputValue(''); setShowHistory(false); }
   };
 
-  return (
-    <header className="flex justify-between items-center mb-6 md:mb-10 gap-4 relative z-50">
-      <div className="flex items-center gap-4 flex-1">
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="lg:hidden p-3 bg-white/90 backdrop-blur-xl rounded-2xl shadow-sm border border-white/50 text-slate-700"
-        >
-          {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </motion.button>
+  const sourceBadge = locationSource ? SOURCE_BADGE[locationSource] : null;
 
-        <div className="relative w-full max-w-md">
-          <form onSubmit={handleSubmit}>
+  return (
+    <header className="flex items-center gap-3 mb-8 relative z-50">
+      {/* Search */}
+      <div className="relative flex-1 max-w-sm">
+        <form onSubmit={handleSubmit}>
+          <div className="flex items-center gap-3 bg-white/12 backdrop-blur-2xl border border-white/15 rounded-2xl px-4 py-3 focus-within:border-white/30 transition-colors">
+            <Search className="w-4 h-4 text-white/50 shrink-0" />
             <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              type="text" value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
               onFocus={() => setShowHistory(true)}
               onBlur={() => setTimeout(() => setShowHistory(false), 200)}
               placeholder="Cari kota..."
-              className="w-full bg-white/90 backdrop-blur-xl border-none rounded-2xl py-3 md:py-4 pl-12 md:pl-14 pr-6 shadow-sm focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-400 font-medium text-sm md:text-base"
+              className="bg-transparent text-sm text-white placeholder-white/30 outline-none flex-1 font-medium"
             />
-            <Search className="absolute left-4 md:left-5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 md:w-5 md:h-5" />
-          </form>
+            {inputValue && (
+              <button type="button" onClick={() => setInputValue('')}>
+                <X className="w-3.5 h-3.5 text-white/50" />
+              </button>
+            )}
+          </div>
+        </form>
 
-          {/* Dropdown Riwayat Pencarian */}
-          <AnimatePresence>
-            {showHistory && searchHistory.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden"
-              >
-                <div className="p-4 border-b border-slate-50 flex justify-between items-center">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                    Pencarian Terakhir
-                  </span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); clearHistory(); }}
-                    className="text-slate-300 hover:text-rose-500 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className="max-h-60 overflow-y-auto">
-                  {searchHistory.map((c, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => { onSearch(c); setShowHistory(false); }}
-                      className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors text-left"
-                    >
-                      <Clock className="w-4 h-4 text-slate-300" />
-                      <span className="text-sm font-medium text-slate-600">{c}</span>
-                    </button>
-                  ))}
-                </div>
+        {/* Location status badge */}
+        <div className="absolute -bottom-6 left-0">
+          <AnimatePresence mode="wait">
+            {locationStatus === 'detecting' && (
+              <motion.div key="detecting" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex items-center gap-1.5">
+                <Loader2 className="w-3 h-3 text-blue-400 animate-spin" />
+                <span className="text-[10px] font-bold text-white/50">Mendeteksi lokasi...</span>
+              </motion.div>
+            )}
+            {locationStatus === 'granted' && sourceBadge && (
+              <motion.div key="granted" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex items-center gap-1.5" title={`Sumber: ${sourceBadge.label}`}>
+                <sourceBadge.icon className={`w-3 h-3 ${sourceBadge.color}`} />
+                <span className={`text-[10px] font-bold ${sourceBadge.color} opacity-70`}>
+                  {sourceBadge.label}
+                </span>
+              </motion.div>
+            )}
+            {locationStatus === 'denied' && (
+              <motion.div key="denied" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="flex items-center gap-1.5">
+                <MapPinOff className="w-3 h-3 text-white/35" />
+                <span className="text-[10px] font-bold text-white/35">Lokasi diblokir</span>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
+        {/* History dropdown */}
+        <AnimatePresence>
+          {showHistory && searchHistory.length > 0 && (
+            <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }}
+              className="absolute top-full left-0 right-0 mt-2 bg-slate-900/95 backdrop-blur-2xl rounded-2xl border border-white/15 overflow-hidden shadow-xl">
+              <div className="flex justify-between items-center px-4 py-3 border-b border-white/5">
+                <span className="text-[9px] font-black text-white/50 uppercase tracking-widest">Terakhir Dicari</span>
+                <button onClick={e => { e.stopPropagation(); clearHistory(); }} className="text-white/35 hover:text-red-400 transition-colors">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+              {searchHistory.map((c, i) => (
+                <button key={i} onClick={() => { onSearch(c); setShowHistory(false); }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-white/10 transition-colors text-left">
+                  <Clock className="w-3.5 h-3.5 text-white/35" />
+                  <span className="text-sm font-medium text-white/50">{c}</span>
+                </button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <div className="flex items-center space-x-2 md:space-x-4">
-        <motion.button
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.05 }}
-          onClick={() => setIsCelsius(!isCelsius)}
-          className="bg-white/90 backdrop-blur-xl px-3 md:px-4 py-2 md:py-3 rounded-2xl shadow-sm border border-white/50 text-xs md:text-sm font-bold text-blue-600 flex items-center gap-2"
-        >
-          <span className={isCelsius ? 'opacity-100' : 'opacity-30'}>°C</span>
-          <div className="w-[1px] h-3 bg-slate-200" />
-          <span className={!isCelsius ? 'opacity-100' : 'opacity-30'}>°F</span>
-        </motion.button>
+      {/* Right side: °C/°F + city info */}
+      <div className="flex items-center gap-3 ml-auto">
+        <button onClick={() => setIsCelsius(!isCelsius)}
+          className="flex items-center gap-1.5 bg-white/12 border border-white/15 rounded-2xl px-3 py-2.5 text-xs font-bold hover:bg-white/15 transition-colors">
+          <span className={isCelsius ? 'text-white' : 'text-white/50'}>°C</span>
+          <span className="text-white/35">/</span>
+          <span className={!isCelsius ? 'text-white' : 'text-white/50'}>°F</span>
+        </button>
 
-        <div className="hidden sm:flex items-center space-x-4">
-          <div className="hidden md:block text-right">
-            <p className="text-sm font-bold text-white">{city}, {country}</p>
-            <p className="text-xs text-white/70 font-medium">{formattedDate}</p>
-          </div>
-          <motion.div
-            whileHover={{ rotate: 15 }}
-            className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-white/90 backdrop-blur-xl shadow-sm flex items-center justify-center"
-          >
-            <Clock className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
-          </motion.div>
+        <div className="hidden md:block text-right">
+          <p className="text-sm font-bold text-white">{city}, {country}</p>
+          <p className="text-[11px] text-white/50 font-medium">{formattedDate}</p>
         </div>
       </div>
     </header>

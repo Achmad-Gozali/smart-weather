@@ -9,11 +9,12 @@ interface WeatherAlertBannerProps {
   alerts: WeatherAlert[];
 }
 
+// FIX: Ganti light theme (bg-yellow-50, border-yellow-200) → dark/glass theme
 const SEVERITY_STYLES = {
-  minor:    { bg: 'bg-yellow-50',  border: 'border-yellow-200', icon: 'text-yellow-500', badge: 'bg-yellow-100 text-yellow-700' },
-  moderate: { bg: 'bg-orange-50',  border: 'border-orange-200', icon: 'text-orange-500', badge: 'bg-orange-100 text-orange-700' },
-  severe:   { bg: 'bg-rose-50',    border: 'border-rose-200',   icon: 'text-rose-500',   badge: 'bg-rose-100 text-rose-700'     },
-  extreme:  { bg: 'bg-purple-50',  border: 'border-purple-200', icon: 'text-purple-600', badge: 'bg-purple-100 text-purple-700' },
+  minor:    { bg: 'bg-yellow-500/15',  border: 'border-yellow-400/30', icon: 'text-yellow-400', badge: 'bg-yellow-500/20 text-yellow-300' },
+  moderate: { bg: 'bg-orange-500/15',  border: 'border-orange-400/30', icon: 'text-orange-400', badge: 'bg-orange-500/20 text-orange-300' },
+  severe:   { bg: 'bg-rose-500/15',    border: 'border-rose-400/30',   icon: 'text-rose-400',   badge: 'bg-rose-500/20 text-rose-300'     },
+  extreme:  { bg: 'bg-purple-500/15',  border: 'border-purple-400/30', icon: 'text-purple-400', badge: 'bg-purple-500/20 text-purple-300' },
 };
 
 const SEVERITY_LABELS: Record<string, string> = {
@@ -35,7 +36,7 @@ const WeatherAlertBanner: React.FC<WeatherAlertBannerProps> = ({ alerts }) => {
       <AnimatePresence>
         {alerts.map((alert, idx) => {
           if (dismissed.includes(idx)) return null;
-          const style = SEVERITY_STYLES[alert.severity];
+          const style = SEVERITY_STYLES[alert.severity] ?? SEVERITY_STYLES.moderate;
           const isExpanded = expanded.includes(idx);
 
           return (
@@ -45,7 +46,7 @@ const WeatherAlertBanner: React.FC<WeatherAlertBannerProps> = ({ alerts }) => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, x: 20, scale: 0.95 }}
               transition={{ duration: 0.3 }}
-              className={`rounded-2xl border ${style.bg} ${style.border} p-4 md:p-5`}
+              className={`rounded-2xl border backdrop-blur-xl ${style.bg} ${style.border} p-4 md:p-5`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
@@ -54,13 +55,13 @@ const WeatherAlertBanner: React.FC<WeatherAlertBannerProps> = ({ alerts }) => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap mb-1">
-                      <span className="text-sm font-black text-slate-900">{alert.headline}</span>
+                      <span className="text-sm font-black text-white">{alert.headline}</span>
                       <span className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${style.badge}`}>
                         {SEVERITY_LABELS[alert.severity] ?? alert.severity}
                       </span>
                     </div>
                     {alert.event && (
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
+                      <p className="text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1">
                         {alert.event}
                       </p>
                     )}
@@ -70,7 +71,7 @@ const WeatherAlertBanner: React.FC<WeatherAlertBannerProps> = ({ alerts }) => {
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: 'auto' }}
                           exit={{ opacity: 0, height: 0 }}
-                          className="text-xs text-slate-600 leading-relaxed mt-2"
+                          className="text-xs text-white/60 leading-relaxed mt-2"
                         >
                           {alert.desc}
                         </motion.p>
@@ -84,14 +85,14 @@ const WeatherAlertBanner: React.FC<WeatherAlertBannerProps> = ({ alerts }) => {
                       onClick={() => setExpanded(prev =>
                         prev.includes(idx) ? prev.filter(i => i !== idx) : [...prev, idx]
                       )}
-                      className="p-1.5 rounded-xl hover:bg-white/60 transition-colors text-slate-400"
+                      className="p-1.5 rounded-xl hover:bg-white/10 transition-colors text-white/40"
                     >
                       {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                     </button>
                   )}
                   <button
                     onClick={() => setDismissed(prev => [...prev, idx])}
-                    className="p-1.5 rounded-xl hover:bg-white/60 transition-colors text-slate-400"
+                    className="p-1.5 rounded-xl hover:bg-white/10 transition-colors text-white/40"
                   >
                     <X className="w-4 h-4" />
                   </button>

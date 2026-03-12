@@ -1,65 +1,63 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Activity } from 'lucide-react';
-import BentoCard from './BentoCard';
+import { Droplets, Wind } from 'lucide-react';
 import { ForecastHour } from '../lib/mockData';
 
 interface HourlyForecastProps {
   data: ForecastHour[];
   isCelsius: boolean;
-  convert: (temp: number) => number;
+  convert: (t: number) => number;
 }
 
-const AnimatedTemp = ({ value, unit, className = '' }: { value: number; unit: string; className?: string }) => (
-  <AnimatePresence mode="wait">
-    <motion.span key={`${value}-${unit}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.3 }} className={className}>{value}</motion.span>
-  </AnimatePresence>
-);
-
-const TempChart = ({ data }: { data: ForecastHour[] }) => {
-  const maxTemp = Math.max(...data.map((d) => d.temp));
-  const minTemp = Math.min(...data.map((d) => d.temp));
-  const range = maxTemp - minTemp || 1;
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * 100;
-    const y = 80 - ((d.temp - minTemp) / range) * 60;
-    return `${x},${y}`;
-  }).join(' ');
+const HourlyForecast: React.FC<HourlyForecastProps> = ({ data, isCelsius, convert }) => {
+  const [hov, setHov] = useState<number | null>(null);
 
   return (
-    <div className="w-full h-16 mt-4 opacity-40">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
-        <motion.polyline initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 1.5, ease: 'easeInOut' }}
-          fill="none" stroke="#60a5fa" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" points={points} />
-      </svg>
-    </div>
-  );
-};
+    <div className="bg-slate-900/60 backdrop-blur-2xl border border-white/15 rounded-3xl p-5">
+      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
+        {data.map((h, i) => (
+          <motion.div key={i}
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+            onMouseEnter={() => setHov(i)} onMouseLeave={() => setHov(null)}
+            className={`flex flex-col items-center gap-2.5 shrink-0 rounded-2xl px-4 py-3.5 min-w-[72px] transition-all cursor-default ${
+              i === 0 ? 'bg-white/15 border border-white/20' : hov === i ? 'bg-white/12' : 'bg-white/10'
+            }`}
+          >
+            <span className={`text-[10px] font-black uppercase tracking-wide ${i === 0 ? 'text-white' : 'text-white/40'}`}>
+              {h.time}
+            </span>
+            <div className="w-8 h-8 flex items-center justify-center">{h.icon}</div>
+            <span className={`text-base font-black ${i === 0 ? 'text-white' : 'text-white/70'}`}>
+              {convert(h.temp)}°
+            </span>
 
-const HourlyForecast: React.FC<HourlyForecastProps> = ({ data, isCelsius, convert }) => (
-  <BentoCard className="p-8 md:p-10" delay={0.3}>
-    <div className="flex justify-between items-center mb-6 md:mb-8">
-      <h3 className="text-[10px] md:text-sm font-black text-white/40 uppercase tracking-widest">Perkiraan 24 Jam</h3>
-      <div className="flex items-center space-x-2 text-blue-400 font-bold text-[10px] md:text-xs">
-        <Activity className="w-3 h-3 md:w-4 md:h-4" />
-        <span>TREN LANGSUNG</span>
-      </div>
-    </div>
-    <div className="overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
-      <div className="flex space-x-8 md:space-x-10 min-w-max">
-        {data.map((hour, idx) => (
-          <motion.div key={idx} whileHover={{ scale: 1.1 }} className="flex flex-col items-center space-y-3 md:space-y-4">
-            <span className="text-[10px] md:text-xs font-bold text-white/40">{hour.time}</span>
-            <div className="p-2.5 md:p-3 bg-white/10 rounded-2xl">{hour.icon}</div>
-            <span className="text-base md:text-lg font-black text-white"><AnimatedTemp value={convert(hour.temp)} unit="" />°</span>
+            {/* Mini stats on hover */}
+            <AnimatePresence>
+              {hov === i && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
+                  className="flex flex-col items-center gap-1 overflow-hidden">
+                  {h.humidity != null && (
+                    <div className="flex items-center gap-1">
+                      <Droplets className="w-2.5 h-2.5 text-blue-400" />
+                      <span className="text-[9px] text-white/40 font-bold">{h.humidity}%</span>
+                    </div>
+                  )}
+                  {h.wind_speed != null && (
+                    <div className="flex items-center gap-1">
+                      <Wind className="w-2.5 h-2.5 text-white/50" />
+                      <span className="text-[9px] text-white/40 font-bold">{h.wind_speed}</span>
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
         ))}
       </div>
     </div>
-    <TempChart data={data} />
-  </BentoCard>
-);
+  );
+};
 
 export default HourlyForecast;
